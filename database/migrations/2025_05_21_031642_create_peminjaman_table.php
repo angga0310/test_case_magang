@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('peminjamans', function (Blueprint $table) {
+        Schema::create('peminjaman', function (Blueprint $table) {
             $table->id('id_peminjaman'); // Primary key yang tidak rancu
             $table->unsignedBigInteger('id_user');
             $table->unsignedBigInteger('id_buku');
@@ -30,7 +30,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('peminjamans');
+        Schema::dropIfExists('peminjaman');
     }
 };
 
