@@ -16,14 +16,15 @@ class Peminjaman extends Model
         'id_user', 'id_buku', 'tanggal_pinjam', 'tanggal_kembali'
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'id');
-    }
+   public function user()
+{
+    return $this->belongsTo(User::class, 'id_user', 'id');
+}
 
-    public function buku()
-    {
-        return $this->belongsTo(Buku::class, 'id_buku');
-    }
+public function buku()
+{
+    return $this->belongsTo(Buku::class, 'id_buku', 'id_buku');
+}
+
 }
 

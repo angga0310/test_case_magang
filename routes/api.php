@@ -11,3 +11,5 @@ Route::get('/getbuku', [BukuController::class, 'index']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/pinjam', [PeminjamanController::class, 'pinjamBuku']);
+Route::get('/getpinjam', [PeminjamanController::class, 'daftarPeminjamanUser']);
+Route::post('/pengembalian', [PeminjamanController::class, 'kembalikanBuku']);
