@@ -22,3 +22,4 @@ Route::get('/users', [UserController::class, 'index']);
 Route::get('/peminjaman', [PeminjamanController::class, 'daftarPeminjaman']);
 Route::post('/peminjaman/pinjam', [PeminjamanController::class, 'pinjamBuku']);
 Route::post('/peminjaman/kembali', [PeminjamanController::class, 'kembalikanBuku']);
+Route::get('/getpinjam', [PeminjamanController::class, 'daftarPeminjamanUser']);

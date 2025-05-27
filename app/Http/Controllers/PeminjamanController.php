@@ -92,7 +92,6 @@ class PeminjamanController extends Controller
             // Ambil data peminjaman + relasi user dan buku
             $peminjaman = Peminjaman::with(['buku', 'user'])
                 ->where('id_user', $validated['id_user'])
-                ->whereNull('tanggal_kembali')
                 ->get();
 
             return response()->json([
