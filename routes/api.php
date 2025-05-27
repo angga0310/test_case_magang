@@ -11,6 +11,7 @@ use App\Http\Controllers\PeminjamanController;
 
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/buku', [BukuController::class, 'index']);
 Route::post('/buku', [BukuController::class, 'store']);
