@@ -18,6 +18,8 @@ Route::put('/buku/{id}', [BukuController::class, 'update']);
 Route::delete('/buku/{id}', [BukuController::class, 'destroy']);
 Route::get('/buku/{id}', [BukuController::class, 'show']);
 Route::get('/users', [UserController::class, 'index']);
+Route::post('/logout', [AuthController::class, 'logout']);
+
 
 Route::get('/peminjaman', [PeminjamanController::class, 'daftarPeminjaman']);
 Route::post('/peminjaman/pinjam', [PeminjamanController::class, 'pinjamBuku']);
