@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      - context: .
+      - dockerfile: Dockerfile
+    working_dir: /var/www
+    volumes:
+      - testmagang-cover:/var/www/public/img
+    networks:
+      - traefik-public
+    environment:
+      - APP_ENV=local
+      - APP_KEY="base64:IzyvNHW3eEKkJ9dBMsyE7ERh6HgUsbA4v50PplkwY3c="
+      - APP_DEBUG=true
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=perpustakaan_test
+      - DB_USERNAME=root
+      - DB_PASSWORD=Elibrary2025!
+    ports:
+      - 6969:80
+volumes:
+  testmagang-cover:
+
+networks:
+  traefik-public:
+    external: true

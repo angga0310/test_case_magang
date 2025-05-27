@@ -6,10 +6,9 @@ use App\Http\Controllers\BukuController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PeminjamanController;
 
+
+Route::get('/buku', [BukuController::class, 'index']);
 Route::post('/buku', [BukuController::class, 'store']);
-Route::get('/getbuku', [BukuController::class, 'index']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/pinjam', [PeminjamanController::class, 'pinjamBuku']);
-Route::get('/getpinjam', [PeminjamanController::class, 'daftarPeminjamanUser']);
-Route::post('/pengembalian', [PeminjamanController::class, 'kembalikanBuku']);
+Route::put('/buku/{id}', [BukuController::class, 'update']);
+Route::delete('/buku/{id}', [BukuController::class, 'destroy']);
+Route::get('/buku/{id}', [BukuController::class, 'show']);
