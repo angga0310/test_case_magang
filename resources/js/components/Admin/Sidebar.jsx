@@ -8,6 +8,7 @@ export default function Sidebar() {
         <Link to="/admin" className="block hover:bg-indigo-600 px-4 py-2 rounded">Dashboard</Link>
         <Link to="/admin/buku" className="block hover:bg-indigo-600 px-4 py-2 rounded">Buku</Link>
         <Link to="/admin/bukuAPI" className="block hover:bg-indigo-600 px-4 py-2 rounded">Buku API</Link>
+        <Link to="/admin/peminjaman" className="block hover:bg-indigo-600 px-4 py-2 rounded">Peminjaman</Link>
       </nav>
     </aside>
   );

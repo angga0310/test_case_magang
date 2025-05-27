@@ -1,61 +1,76 @@
-// store/useBukuStoreAPI.js
 import { create } from "zustand";
-import { fetchBuku, addBuku, updateBuku, deleteBuku } from "@/api/buku";
+
+const API_BASE = "http://146.190.86.93:6969/api/buku";
 
 const useBukuStoreAPI = create((set) => ({
-    buku: [],
-    loading: false,
-    error: null,
+  bukuList: [],
+  loading: false,
+  error: null,
 
-    fetchbuku: async () => {
-        set({ loading: true, error: null });
-        try {
-            const data = await fetchBuku();
-            set({ buku: data });
-        } catch (err) {
-            set({ error: err.message });
-        } finally {
-            set({ loading: false });
-        }
-    },
+  fetchBuku: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(API_BASE, { headers: { Accept: "application/json" } });
+      if (!res.ok) throw new Error("Gagal fetch buku!");
+      const data = await res.json();
+      set({ bukuList: data });
+    } catch (err) {
+      set({ error: err.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
 
-    addBook: async (formData) => {
-        set({ loading: true, error: null });
-        try {
-            console.log("FormData yang dikirim:", formData); // debug!
-            await addBuku(formData);
-            await set((state) => state.fetchbuku());
-        } catch (err) {
-            console.log("Error addBook:", err);
-            set({ error: err.message });
-        } finally {
-            set({ loading: false });
-        }
-    },
+  addBuku: async (formData) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(API_BASE, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Gagal tambah buku!");
+      await set((state) => state.fetchBuku());
+    } catch (err) {
+      set({ error: err.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
 
-    updateBook: async (id, formData) => {
-        set({ loading: true, error: null });
-        try {
-            await updateBuku(id, formData);
-            await set((state) => state.fetchbuku());
-        } catch (err) {
-            set({ error: err.message });
-        } finally {
-            set({ loading: false });
-        }
-    },
+  updateBuku: async (id, formData) => {
+    formData.append("_method", "PUT");
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Gagal update buku!");
+      await set((state) => state.fetchBuku());
+    } catch (err) {
+      set({ error: err.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
 
-    deleteBook: async (id) => {
-        set({ loading: true, error: null });
-        try {
-            await deleteBuku(id);
-            await set((state) => state.fetchbuku());
-        } catch (err) {
-            set({ error: err.message });
-        } finally {
-            set({ loading: false });
-        }
-    },
+  hapusBuku: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, {
+        method: "DELETE",
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) throw new Error("Gagal hapus buku!");
+      await set((state) => state.fetchBuku());
+    } catch (err) {
+      set({ error: err.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
 
 export default useBukuStoreAPI;

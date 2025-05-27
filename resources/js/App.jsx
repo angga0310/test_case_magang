@@ -6,6 +6,7 @@ import AdminLayout from './pages/Admin/AdminLayout';
 import Dashboard from './pages/Admin/Dashboard';
 import Buku from './pages/Admin/Buku';
 import BukuAPI from './pages/Admin/BukuAPI';
+import Peminjaman from './pages/Admin/Peminjaman';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="buku" element={<Buku />} />
           <Route path="bukuAPI" element={<BukuAPI />} />
+          <Route path="peminjaman" element={<Peminjaman />} />
         </Route>
       </Routes>
     </Router>
