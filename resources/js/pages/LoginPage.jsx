@@ -1,30 +1,34 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../store/useAuthStore';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  function handleLogin(e) {
+  const { login, loginError } = useAuthStore();
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'admin123') {
+    const success = await login({ email, password });
+    if (success) {
       navigate('/admin');
     } else {
-      alert('Username atau password salah');
+      alert(loginError || 'Login gagal');
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login Admin</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <input
           type="text"
-          placeholder="Username"
+          placeholder="Email"
           className="w-full p-3 border rounded mb-4"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"

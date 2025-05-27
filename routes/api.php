@@ -9,6 +9,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PeminjamanController;
 
 
+
+Route::post('/login', [AuthController::class, 'login']);
+
 Route::get('/buku', [BukuController::class, 'index']);
 Route::post('/buku', [BukuController::class, 'store']);
 Route::put('/buku/{id}', [BukuController::class, 'update']);

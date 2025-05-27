@@ -141,7 +141,7 @@ export default function BukuAPI() {
                         <span className="text-red-500">Dipinjam</span>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-center flex items-center gap-1 justify-center">
+                    <td className="px-3 py-4 text-center border flex items-center gap-1 justify-center">
                       <button
                         onClick={() => openEditModal(buku)}
                         className="bg-purple-500 text-white px-2 py-1 rounded hover:bg-purple-600"
