@@ -16,7 +16,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd test-magang \
-            git pull origin main \
+            cd test-magang && \
+            git pull origin main && \
             docker compose up -d --build
             
