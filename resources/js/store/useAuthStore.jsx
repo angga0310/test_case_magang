@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-const API_LOGIN = "http://127.0.0.1:8000/api/login";
+const API_LOGIN = "http://146.190.86.93:6969/api/login";
 
 const useAuthStore = create(
     persist(
