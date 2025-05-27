@@ -18,7 +18,7 @@ export default function App() {
         {/* Admin Routes (nested) */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="buku" element={<Buku />} />
+          {/* <Route path="buku" element={<Buku />} /> */}
           <Route path="bukuAPI" element={<BukuAPI />} />
           <Route path="peminjaman" element={<Peminjaman />} />
         </Route>

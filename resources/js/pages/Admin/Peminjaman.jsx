@@ -2,13 +2,21 @@ import React, { useState, useEffect } from "react";
 import usePeminjamanStoreAPI from "../../store/usePeminjamanStoreAPI";
 
 export default function Peminjaman() {
-    const { pinjamBuku, fetchPeminjamanUser, kembalikanBuku, peminjamanList, loading, error } = usePeminjamanStoreAPI();
+    const {
+        fetchPeminjamanList,
+        pinjamBuku,
+        kembalikanBuku,
+        peminjamanList,
+        loading,
+        error,
+    } = usePeminjamanStoreAPI();
 
     const [showModal, setShowModal] = useState(false);
     const [idUser, setIdUser] = useState("");
     const [idBuku, setIdBuku] = useState("");
     const [users, setUsers] = useState([]);
     const [bukuList, setBukuList] = useState([]);
+    const [tanggalPinjam, setTanggalPinjam] = useState("");
 
     // Ambil daftar user
     const fetchUsers = async () => {
@@ -38,7 +46,12 @@ export default function Peminjaman() {
         }
     };
 
-    // Saat modal muncul, ambil data user dan buku
+    // Saat halaman pertama kali dimuat, langsung ambil semua peminjaman
+    useEffect(() => {
+        fetchPeminjamanList();
+    }, []);
+
+    // Saat modal muncul, ambil data user & buku
     useEffect(() => {
         if (showModal) {
             fetchUsers();
@@ -50,15 +63,19 @@ export default function Peminjaman() {
     const handleTambahPeminjaman = async (e) => {
         e.preventDefault();
         try {
-            await pinjamBuku({
+            const data = {
                 id_user: parseInt(idUser),
                 id_buku: parseInt(idBuku),
-            });
+            };
+            if (tanggalPinjam) data.tanggal_pinjam = tanggalPinjam;
+
+            await pinjamBuku(data);
             alert("Buku berhasil dipinjam!");
             setShowModal(false);
             setIdUser("");
             setIdBuku("");
-            await fetchPeminjamanUser(idUser); // refresh
+            setTanggalPinjam("");
+            await fetchPeminjamanList(); // refresh tabel
         } catch (e) {
             console.error(e);
             alert("Gagal meminjam buku");
@@ -67,13 +84,11 @@ export default function Peminjaman() {
 
     // Kembalikan Buku
     const handleKembalikan = async (id_user, id_peminjaman) => {
+        console.log("Mengembalikan buku:", { id_user, id_peminjaman }); // 🔎 Tambahkan log
         try {
-            await kembalikanBuku({
-                id_user,
-                id_peminjaman,
-            });
+            await kembalikanBuku({ id_user, id_peminjaman });
             alert("Buku berhasil dikembalikan!");
-            await fetchPeminjamanUser(id_user); // refresh
+            await fetchPeminjamanList();
         } catch (e) {
             console.error(e);
             alert("Gagal mengembalikan buku");
@@ -84,31 +99,16 @@ export default function Peminjaman() {
         <div className="p-6">
             <h2 className="text-2xl font-bold mb-4">Manajemen Peminjaman</h2>
 
-            <div className="flex gap-2 mb-4">
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                >
-                    + Tambah Peminjaman
-                </button>
-                <button
-                    onClick={() => {
-                        if (idUser) {
-                            fetchPeminjamanUser(idUser);
-                        } else {
-                            alert("Masukkan ID User untuk lihat data.");
-                        }
-                    }}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                >
-                    Lihat Peminjaman
-                </button>
-            </div>
+            <button
+                onClick={() => setShowModal(true)}
+                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 mb-4"
+            >
+                + Tambah Peminjaman
+            </button>
 
             {loading && <p>Loading...</p>}
             {error && <p className="text-red-500">{error}</p>}
 
-            {/* Tabel */}
             <div className="overflow-x-auto bg-white rounded shadow">
                 <table className="min-w-full text-sm">
                     <thead className="bg-gray-100">
@@ -116,22 +116,40 @@ export default function Peminjaman() {
                             <th className="px-3 py-2 border">Nama User</th>
                             <th className="px-3 py-2 border">ID Buku</th>
                             <th className="px-3 py-2 border">Tanggal Pinjam</th>
-                            <th className="px-3 py-2 border">Tanggal Kembali</th>
+                            <th className="px-3 py-2 border">
+                                Tanggal Kembali
+                            </th>
                             <th className="px-3 py-2 border">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {peminjamanList.length > 0 ? (
                             peminjamanList.map((p) => (
-                                <tr key={p.id_peminjaman} className="hover:bg-gray-50">
-                                    <td className="px-3 py-2 border text-center">{p.user ? p.user.name : "-"}</td>
-                                    <td className="px-3 py-2 border text-center">{p.id_buku}</td>
-                                    <td className="px-3 py-2 border text-center">{p.tanggal_pinjam}</td>
-                                    <td className="px-3 py-2 border text-center">{p.tanggal_kembali || "-"}</td>
+                                <tr
+                                    key={p.id_peminjaman}
+                                    className="hover:bg-gray-50"
+                                >
+                                    <td className="px-3 py-2 border text-center">
+                                        {p.user ? p.user.name : p.id_user}
+                                    </td>
+                                    <td className="px-3 py-2 border text-center">
+                                        {p.buku ? p.buku.judul : p.id_buku}
+                                    </td>
+                                    <td className="px-3 py-2 border text-center">
+                                        {p.tanggal_pinjam}
+                                    </td>
+                                    <td className="px-3 py-2 border text-center">
+                                        {p.tanggal_kembali || "-"}
+                                    </td>
                                     <td className="px-3 py-2 border text-center">
                                         {!p.tanggal_kembali && (
                                             <button
-                                                onClick={() => handleKembalikan(p.id_user, p.id_peminjaman)}
+                                                onClick={() =>
+                                                    handleKembalikan(
+                                                        p.id_user,
+                                                        p.id_peminjaman
+                                                    )
+                                                }
                                                 className="bg-purple-500 text-white px-2 py-1 rounded hover:bg-purple-600"
                                             >
                                                 Kembalikan
@@ -151,12 +169,16 @@ export default function Peminjaman() {
                 </table>
             </div>
 
-            {/* Modal Tambah */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white rounded p-4 w-80">
-                        <h2 className="text-lg font-bold mb-2">Tambah Peminjaman</h2>
-                        <form onSubmit={handleTambahPeminjaman} className="space-y-2">
+                        <h2 className="text-lg font-bold mb-2">
+                            Tambah Peminjaman
+                        </h2>
+                        <form
+                            onSubmit={handleTambahPeminjaman}
+                            className="space-y-2"
+                        >
                             <select
                                 value={idUser}
                                 onChange={(e) => setIdUser(e.target.value)}
@@ -179,17 +201,36 @@ export default function Peminjaman() {
                             >
                                 <option value="">Pilih Buku</option>
                                 {bukuList.map((buku) => (
-                                    <option key={buku.id_buku} value={buku.id_buku}>
+                                    <option
+                                        key={buku.id_buku}
+                                        value={buku.id_buku}
+                                    >
                                         {buku.judul}
                                     </option>
                                 ))}
                             </select>
 
+                            <input
+                                type="date"
+                                value={tanggalPinjam}
+                                onChange={(e) =>
+                                    setTanggalPinjam(e.target.value)
+                                }
+                                className="border rounded px-2 py-1 w-full"
+                            />
+
                             <div className="flex justify-end gap-2">
-                                <button type="button" onClick={() => setShowModal(false)} className="px-3 py-1 border rounded">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowModal(false)}
+                                    className="px-3 py-1 border rounded"
+                                >
                                     Batal
                                 </button>
-                                <button type="submit" className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+                                <button
+                                    type="submit"
+                                    className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+                                >
                                     Simpan
                                 </button>
                             </div>

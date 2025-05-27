@@ -15,3 +15,7 @@ Route::put('/buku/{id}', [BukuController::class, 'update']);
 Route::delete('/buku/{id}', [BukuController::class, 'destroy']);
 Route::get('/buku/{id}', [BukuController::class, 'show']);
 Route::get('/users', [UserController::class, 'index']);
+
+Route::get('/peminjaman', [PeminjamanController::class, 'daftarPeminjaman']);
+Route::post('/peminjaman/pinjam', [PeminjamanController::class, 'pinjamBuku']);
+Route::post('/peminjaman/kembali', [PeminjamanController::class, 'kembalikanBuku']);

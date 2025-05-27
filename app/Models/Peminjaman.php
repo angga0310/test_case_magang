@@ -9,7 +9,7 @@ class Peminjaman extends Model
 {
     use HasFactory;
 
-    protected $table = 'peminjamans';
+    protected $table = 'peminjaman';
     protected $primaryKey = 'id_peminjaman';
     public $incrementing = true;
     protected $fillable = [

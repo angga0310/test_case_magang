@@ -10,18 +10,22 @@ use Illuminate\Support\Facades\Log;
 
 class PeminjamanController extends Controller
 {
-    /**
-     * Pinjam buku.
-     */
+    public function daftarPeminjaman()
+    {
+        // Pakai with(['user', 'buku']) supaya relasi user & buku ikut di-load
+        $peminjaman = Peminjaman::with(['user', 'buku'])->get();
+        return response()->json($peminjaman);
+    }
     public function pinjamBuku(Request $request)
     {
         try {
-            Log::info('Request data:', $request->all());
+            \Log::info('Request data:', $request->all());
 
             // Validasi
             $validated = $request->validate([
                 'id_user' => 'required|exists:users,id',
                 'id_buku' => 'required|exists:buku,id_buku',
+                'tanggal_pinjam' => 'nullable|date', // validasi opsional
             ]);
 
             $buku = Buku::findOrFail($validated['id_buku']);
@@ -30,15 +34,22 @@ class PeminjamanController extends Controller
                 return response()->json(['message' => 'Buku sedang tidak tersedia.'], 400);
             }
 
-            // Catat peminjaman
+            // Gunakan tanggal_pinjam manual jika ada, kalau tidak, default ke sekarang
+            $tanggalPinjam = $validated['tanggal_pinjam'] ?? now();
+
+            // 🟩 Tambahkan: otomatis tanggal kembali 7 hari setelah pinjam
+            $tanggalKembali = \Carbon\Carbon::parse($tanggalPinjam)->addDays(7);
+
+            // Buat record peminjaman
             $peminjaman = Peminjaman::create([
                 'id_user' => $validated['id_user'],
                 'id_buku' => $validated['id_buku'],
-                'tanggal_pinjam' => now(),
+                'tanggal_pinjam' => $tanggalPinjam,
+                'tanggal_kembali' => $tanggalKembali, // 🟩 auto 7 hari kemudian
             ]);
 
             if (!$peminjaman->exists) {
-                Log::error('Gagal menyimpan data peminjaman.');
+                \Log::error('Gagal menyimpan data peminjaman.');
                 return response()->json(['message' => 'Gagal menyimpan data peminjaman.'], 500);
             }
 
@@ -53,7 +64,7 @@ class PeminjamanController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            Log::error('Error pinjam buku:', [
+            \Log::error('Error pinjam buku:', [
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
@@ -65,6 +76,8 @@ class PeminjamanController extends Controller
             ], 500);
         }
     }
+
+
 
     /**
      * Daftar buku yang sedang dipinjam user.
@@ -109,25 +122,25 @@ class PeminjamanController extends Controller
         try {
             $validated = $request->validate([
                 'id_user' => 'required|exists:users,id',
-                'id_peminjaman' => 'required|exists:peminjamans,id_peminjaman',
+                'id_peminjaman' => 'required|exists:peminjaman,id_peminjaman',
             ]);
 
             $peminjaman = Peminjaman::where('id_peminjaman', $validated['id_peminjaman'])
                 ->where('id_user', $validated['id_user'])
-                ->whereNull('tanggal_kembali')
                 ->first();
 
             if (!$peminjaman) {
                 return response()->json([
-                    'message' => 'Data peminjaman tidak ditemukan atau sudah dikembalikan.'
+                    'message' => 'Data peminjaman tidak ditemukan.',
                 ], 404);
             }
 
-            // Update tanggal_kembali
+            // ✅ Update tanggal_kembali & set dikembalikan=1
             $peminjaman->tanggal_kembali = now();
+            $peminjaman->dikembalikan = 1; // 🟩 Tambahkan ini
             $peminjaman->save();
 
-            // Update status buku
+            // ✅ Update buku.tersedia=1
             $buku = Buku::find($peminjaman->id_buku);
             $buku->tersedia = true;
             $buku->save();
@@ -138,16 +151,18 @@ class PeminjamanController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('Error pengembalian buku:', [
+            \Log::error('Error pengembalian buku:', [
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
             ]);
 
             return response()->json([
-                'message' => 'Terjadi kesalahan.',
+                'message' => 'Terjadi kesalahan di server.',
                 'error' => $e->getMessage(),
             ], 500);
         }
     }
+
+
 }
