@@ -142,7 +142,7 @@ export default function Peminjaman() {
                                         {p.tanggal_kembali || "-"}
                                     </td>
                                     <td className="px-3 py-2 border text-center">
-                                        {!p.tanggal_kembali && (
+                                        {p.dikembalikan === 0 ? (
                                             <button
                                                 onClick={() =>
                                                     handleKembalikan(
@@ -154,6 +154,10 @@ export default function Peminjaman() {
                                             >
                                                 Kembalikan
                                             </button>
+                                        ) : (
+                                            <span className="text-green-600 font-semibold">
+                                                Sudah Dikembalikan
+                                            </span>
                                         )}
                                     </td>
                                 </tr>
